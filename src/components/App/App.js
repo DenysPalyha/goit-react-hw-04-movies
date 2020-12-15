@@ -1,25 +1,27 @@
-import React from 'react';
+import React, {Suspense} from 'react';
 import { Switch, Route } from 'react-router-dom';
-import HomePage from '../../views/HomePage';
-import MoviesPageList from '../MoviesPageList/MoviesPageList';
 import NotFound from '../../views/NotFound';
-import MovieDetailsPage from '../../views/MovieDetailsPage';
-import router from '../../services/router';
-
+import routes from '../../services/router';
 import Navigation from '../Navigation/Navigation';
+import Loader from '../Loader/Loader';
 
 const App = () => {
   return (
     <>
+    <Suspense fallback={<Loader/>}>
       <Navigation />
       <Switch>
-        <Route path={router.HOME} exact component={HomePage} />
-        <Route path={router.MOVIES} exact component={MoviesPageList} />
-        <Route path={router.MOVIESDETAILS} component={MovieDetailsPage} />
+        {
+          routes.map(route=> (
+            <Route key={route.path}{...route}/>
+          ))
+        }
         <Route component={NotFound} />
       </Switch>
+      </Suspense>
     </>
   );
 };
 
 export default App;
+
