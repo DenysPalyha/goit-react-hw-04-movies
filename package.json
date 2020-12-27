@@ -24,6 +24,7 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "netlify deploy -p"
+
   },
   "eslintConfig": {
     "extends": [

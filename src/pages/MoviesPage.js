@@ -1,39 +1,44 @@
 import React, { Component } from 'react';
-import parseQueryString from '../../util/parseQueryString';
+import parseQueryString from '../util/parseQueryString';
 import { Link } from 'react-router-dom';
-import Loader from '../Loader/Loader';
-import moviesApi from '../../services/moviesApi';
-import MoviesPage from '../../views/MoviesPage';
-import styles from './MoviesPagesList.module.scss';
-import PropTypes from 'prop-types';
+import axios from 'axios';
+import Loader from '../components/Loader/Loader';
+import MoviesPageSearch from '../components/MoviesPageSearch/MoviesPageSearch';
+import styles from './MoviesPage.module.scss';
 
-class MoviesPageList extends Component {
+const baseURL_search = `https://api.themoviedb.org/3/search/movie?`;
+const API_KEY = process.env.REACT_APP_API_KEY_YT;
+
+class MoviesPage extends Component {
   static propTypes = {};
 
   state = {
     queryMovies: [],
     loading: false,
     error: null,
+    pageNumber: '1',
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     const query = new URLSearchParams(this.props.location.search).get('query');
     if (!query) {
       return;
     }
     this.setState({ loading: true });
 
-    moviesApi
-      .fetchMoviesWithQuery(query)
-      .then(queryMovies => {
-        this.setState({
-          queryMovies,
-        });
-      })
-      .catch(error => {
-        this.setState({ error });
-      })
-      .finally(() => this.setState({ loading: false }));
+    try {
+      const responseSearch = await axios.get(
+        `${baseURL_search}api_key=${API_KEY}&query=${query}&page=${this.state.pageNumber}`,
+      );
+
+      this.setState(queryMovies => ({
+        queryMovies: responseSearch.data.results,
+      }));
+    } catch (error) {
+      this.setState({ error });
+    } finally {
+      this.setState({ loading: false });
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -42,16 +47,24 @@ class MoviesPageList extends Component {
 
     if (prevQuery !== nextQuery) {
       this.setState({ loading: true });
-      this.fetchMowies(nextQuery);
+      this.moviesPageSearch(nextQuery);
     }
   }
 
-  fetchMowies = query => {
-    moviesApi
-      .fetchMoviesWithQuery(query)
-      .then(queryMovies => this.setState({ queryMovies }))
-      .catch(error => this.setState({ error }))
-      .finally(() => this.setState({ loading: false }));
+  moviesPageSearch = async query => {
+    try {
+      const responseSearch = await axios.get(
+        `${baseURL_search}api_key=${API_KEY}&query=${query}&page=${this.state.pageNumber}`,
+      );
+
+      this.setState(queryMovies => ({
+        queryMovies: responseSearch.data.results,
+      }));
+    } catch (error) {
+      this.setState({ error });
+    } finally {
+      this.setState({ loading: false });
+    }
   };
 
   hendleChangeQuery = query => {
@@ -68,11 +81,11 @@ class MoviesPageList extends Component {
 
     return (
       <>
-        <MoviesPage onSubmit={this.hendleChangeQuery} />
+        <MoviesPageSearch onSubmit={this.hendleChangeQuery} />
         {error && <p>Whoops, something went wrong: {error.message}</p>}
         {loading && <Loader />}
         {queryMovies.length > 0 && (
-          <ul className={styles['list']}>
+          <ul className={styles.list}>
             {queryMovies.map(queryMovie => (
               <li key={queryMovie.id}>
                 <Link
@@ -80,7 +93,7 @@ class MoviesPageList extends Component {
                     pathname: `${match.url}/${queryMovie.id}`,
                     state: this.props.location,
                   }}
-                  className={styles['addInfo-list']}
+                  className={styles.addInfoList}
                 >
                   {queryMovie.title}
                 </Link>
@@ -93,4 +106,4 @@ class MoviesPageList extends Component {
   }
 }
 
-export default MoviesPageList;
+export default MoviesPage;
