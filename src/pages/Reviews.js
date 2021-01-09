@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import Loader from '../components/Loader/Loader';
-import axios from 'axios';
+import moviesApi from '../services/moviesApi';
 import styles from './Cast.module.scss';
-
-const baseURL_reviews = `https://api.themoviedb.org/3/movie/`;
-
-const API_KEY = process.env.REACT_APP_API_KEY_YT;
 
 class Reviews extends Component {
   static propTypes = {};
@@ -20,17 +16,11 @@ class Reviews extends Component {
     this.setState({ loading: true });
 
     const id = this.props.match.params.movieId;
+    moviesApi
+      .getMoviesReviews({ id })
+      .then(reviews => this.setState({ reviews: reviews }));
 
-    try {
-      const responseRewiews = await axios.get(
-        `${baseURL_reviews}${id}/reviews?api_key=${API_KEY}`,
-      );
-      this.setState(reviews => ({ reviews: responseRewiews.data.results }));
-    } catch (error) {
-      this.setState({ error });
-    } finally {
-      this.setState({ loading: false });
-    }
+    this.setState({ loading: false });
   }
 
   render() {

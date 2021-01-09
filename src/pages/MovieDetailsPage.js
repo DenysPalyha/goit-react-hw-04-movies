@@ -1,14 +1,10 @@
 import React, { Component, Suspense } from 'react';
 import { Switch, Route, NavLink } from 'react-router-dom';
-import moviesImg from '../services/moviesImg';
-import axios from 'axios';
+import moviesImg from '../util/moviesImg';
+import moviesApi from '../services/moviesApi';
 import Loader from '../components/Loader/Loader';
 import styles from './MovieDitailsPage.module.scss';
 import infoRouters from '../Router/infoRouters';
-
-const baseURL_details = `https://api.themoviedb.org/3/movie/`;
-
-const API_KEY = process.env.REACT_APP_API_KEY_YT;
 
 class MovieDetailsPage extends Component {
   static propTypes = {};
@@ -23,18 +19,11 @@ class MovieDetailsPage extends Component {
     this.setState({ loading: true });
 
     const id = this.props.match.params.movieId;
+    moviesApi
+      .getMoviesDetailsPage({ id })
+      .then(homeMovies => this.setState({ homeMovies: homeMovies }));
 
-    try {
-      const responseDetails = await axios.get(
-        `${baseURL_details}${id}?api_key=${API_KEY}`,
-      );
-
-      this.setState(homeMovies => ({ homeMovies: responseDetails.data }));
-    } catch (error) {
-      this.setState({ error });
-    } finally {
-      this.setState({ loading: false });
-    }
+    this.setState({ loading: false });
   }
 
   handleOnBack = () => {
@@ -55,7 +44,6 @@ class MovieDetailsPage extends Component {
           type="button"
           onClick={this.handleOnBack}
         >
-          {' '}
           go back
         </button>
 

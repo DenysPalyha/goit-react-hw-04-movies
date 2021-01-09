@@ -17,14 +17,6 @@ const mainRouters = [
       import('../pages/MoviesPage.js' /*webpackChunkName: "MoviesPage"*/),
     ),
   },
-
-  {
-    path: '/movies/:movieId',
-    exact: false,
-    component: lazy(() =>
-      import('../pages/MovieDetailsPage.js' /*webpackChunkName: "MoviesDetailsPage"*/),
-    ),
-  },
 ];
 
 export default mainRouters;

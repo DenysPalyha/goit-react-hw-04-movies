@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
 import parseQueryString from '../util/parseQueryString';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import moviesApi from '../services/moviesApi';
 import Loader from '../components/Loader/Loader';
 import MoviesPageSearch from '../components/MoviesPageSearch/MoviesPageSearch';
 import styles from './MoviesPage.module.scss';
-
-const baseURL_search = `https://api.themoviedb.org/3/search/movie?`;
-const API_KEY = process.env.REACT_APP_API_KEY_YT;
 
 class MoviesPage extends Component {
   static propTypes = {};
@@ -19,26 +16,17 @@ class MoviesPage extends Component {
     pageNumber: '1',
   };
 
-  async componentDidMount() {
+  componentDidMount() {
     const query = new URLSearchParams(this.props.location.search).get('query');
     if (!query) {
       return;
     }
     this.setState({ loading: true });
+    moviesApi
+      .getMoviesPageSearch({ query })
+      .then(queryMovies => this.setState({ queryMovies: queryMovies }));
 
-    try {
-      const responseSearch = await axios.get(
-        `${baseURL_search}api_key=${API_KEY}&query=${query}&page=${this.state.pageNumber}`,
-      );
-
-      this.setState(queryMovies => ({
-        queryMovies: responseSearch.data.results,
-      }));
-    } catch (error) {
-      this.setState({ error });
-    } finally {
-      this.setState({ loading: false });
-    }
+    this.setState({ loading: false });
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -51,20 +39,12 @@ class MoviesPage extends Component {
     }
   }
 
-  moviesPageSearch = async query => {
-    try {
-      const responseSearch = await axios.get(
-        `${baseURL_search}api_key=${API_KEY}&query=${query}&page=${this.state.pageNumber}`,
-      );
+  moviesPageSearch = query => {
+    moviesApi
+      .getMoviesPageSearch({ query })
+      .then(queryMovies => this.setState({ queryMovies: queryMovies }));
 
-      this.setState(queryMovies => ({
-        queryMovies: responseSearch.data.results,
-      }));
-    } catch (error) {
-      this.setState({ error });
-    } finally {
-      this.setState({ loading: false });
-    }
+    this.setState({ loading: false });
   };
 
   hendleChangeQuery = query => {

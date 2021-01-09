@@ -1,12 +1,8 @@
 import React, { Component, Suspense } from 'react';
-import axios from 'axios';
-import moviesImg from '../services/moviesImg';
+import moviesImg from '../util/moviesImg';
+import moviesApi from '../services/moviesApi';
 import Loader from '../components/Loader/Loader';
 import styles from './Cast.module.scss';
-
-const baseURL_cast = `https://api.themoviedb.org/3/movie/`;
-
-const API_KEY = process.env.REACT_APP_API_KEY_YT;
 
 class Cast extends Component {
   static propTypes = {};
@@ -17,21 +13,15 @@ class Cast extends Component {
     loading: false,
   };
 
-  async componentDidMount() {
+  componentDidMount() {
     this.setState({ loading: true });
 
     const id = this.props.match.params.movieId;
-    try {
-      const responseCast = await axios.get(
-        `${baseURL_cast}${id}/credits?api_key=${API_KEY}`,
-      );
+    moviesApi
+      .getMoviesCast({ id })
+      .then(credits => this.setState({ credits: credits }));
 
-      this.setState(credits => ({ credits: responseCast.data.cast }));
-    } catch (error) {
-      this.setState({ error });
-    } finally {
-      this.setState({ loading: false });
-    }
+    this.setState({ loading: false });
   }
 
   render() {

@@ -1,12 +1,8 @@
 import React, { Component, Suspense } from 'react';
 import { NavLink } from 'react-router-dom';
 import Loader from '../components/Loader/Loader';
-import axios from 'axios';
 import styles from './HomePage.module.scss';
-
-const baseURL_home = 'https://api.themoviedb.org/3/trending/movie/day?';
-
-const API_KEY = process.env.REACT_APP_API_KEY_YT;
+import moviesApi from '../services/moviesApi';
 
 class HomePage extends Component {
   static propTypes = {};
@@ -17,17 +13,14 @@ class HomePage extends Component {
     error: null,
   };
 
-  async componentDidMount() {
+  componentDidMount() {
     this.setState({ loading: true });
-    try {
-      const response = await axios.get(`${baseURL_home}api_key=${API_KEY}`);
 
-      this.setState(homeMovies => ({ homeMovies: response.data.results }));
-    } catch (error) {
-      this.setState({ error });
-    } finally {
-      this.setState({ loading: false });
-    }
+    moviesApi
+      .getHomeMoviesTrending()
+      .then(homeMovies => this.setState({ homeMovies: homeMovies }));
+
+    this.setState({ loading: false });
   }
 
   render() {

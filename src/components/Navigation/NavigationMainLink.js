@@ -5,14 +5,13 @@ import mainRouters from '../../Router/mainRouters';
 import styles from './NavigationMainLink.module.scss';
 import './Active.module.scss';
 
-const NavigationLink = {
+const navigationLink = {
   fontSize: '20px',
   padding: '20px',
   textDecoration: 'none',
   fontWeight: 800,
-  color: '#382323'
+  color: '#382323',
 };
-
 
 const NavigationMainLink = () => {
   return (
@@ -23,9 +22,9 @@ const NavigationMainLink = () => {
             <NavLink
               key={router.path}
               to={router.path}
+              style={navigationLink}
+              activeClassName="activ"
               className="link"
-            activeClassName="activ"
-              style= {NavigationLink}
             >
               {router.name}
             </NavLink>
